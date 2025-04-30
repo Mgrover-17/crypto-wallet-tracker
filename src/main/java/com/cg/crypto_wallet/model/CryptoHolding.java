@@ -1,9 +1,11 @@
 package com.cg.crypto_wallet.model;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
 import java.time.LocalDateTime;
 
+@Data
 @Entity
 public class CryptoHolding {
     @Id
@@ -15,13 +17,13 @@ public class CryptoHolding {
     private User user;
 
     @Column(nullable = false)
-    private String coinSymbol; // e.g., "BTC"
+    private String coinSymbol;
 
-    @Column(precision = 18, scale = 8) // For crypto units (supports decimals)
+    @Column(nullable = false)
     private double units;
 
-    @Column(precision = 18, scale = 2) // For USD price
-    private double buyPrice;
+    @Column(nullable = false)
+    private double purchasePrice;
 
     private LocalDateTime purchaseDate;
 }
