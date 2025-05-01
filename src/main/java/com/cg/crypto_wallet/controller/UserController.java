@@ -1,9 +1,6 @@
 package com.cg.crypto_wallet.controller;
 
-import com.cg.crypto_wallet.DTO.LoginDto;
-import com.cg.crypto_wallet.DTO.ResetPasswordDto;
-import com.cg.crypto_wallet.DTO.RegisterDto;
-import com.cg.crypto_wallet.DTO.ResponseDto;
+import com.cg.crypto_wallet.DTO.*;
 import com.cg.crypto_wallet.service.IUserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -48,6 +45,12 @@ class UserController {
         log.info("Forget Password");
         return userService.forgetPassword(email);
 
+    }
+
+    @PostMapping("/changePassword")
+    public ResponseEntity<ResponseDto> changePassword(@RequestBody ChangePasswordDto changePasswordDto) {
+        ResponseDto response = userService.changePassword(changePasswordDto);
+        return ResponseEntity.ok(response);
     }
 
 }

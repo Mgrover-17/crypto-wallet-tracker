@@ -113,6 +113,40 @@ public class UserService implements IUserService {
     }
 
     @Override
+    public ResponseDto changePassword(ChangePasswordDto changePasswordDto) {
+        log.info("Change password attempt for user: {}", changePasswordDto.getEmail());
+        ResponseDto res = new ResponseDto("", HttpStatus.OK);
+        Optional<User> userExists = getUserByEmail(changePasswordDto.getEmail());
+
+        if (userExists.isPresent()) {
+            User user = userExists.get();
+
+            if (matchPassword(changePasswordDto.getOldPassword(), user.getPassword())) {
+                user.setPassword(passwordEncoder.encode(changePasswordDto.getNewPassword()));
+                userRepository.save(user);
+                log.info("Password changed successfully for user: {}", user.getEmail());
+
+                emailService.sendEmail(
+                        user.getEmail(),
+                        "Crypto-Wallet: Password Changed",
+                        "Your password has been successfully changed."
+                );
+
+                res.setMessage("message Password changed successfully.");
+                return res;
+            } else {
+                log.warn("Old password mismatch for user: {}", changePasswordDto.getEmail());
+                res.setMessage("error Old password is incorrect.");
+                return res;
+            }
+        }
+
+        log.error("User not found with email: {}", changePasswordDto.getEmail());
+        res.setMessage("error User not found.");
+        return res;
+    }
+
+    @Override
     public ResponseEntity<?> resetPassword(ResetPasswordDto resetPasswordDto) {
         String email = resetPasswordDto.getEmail();
         User user = userRepository.findByEmail(email).orElse(null);

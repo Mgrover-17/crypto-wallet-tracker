@@ -1,9 +1,6 @@
 package com.cg.crypto_wallet.service;
 
-import com.cg.crypto_wallet.DTO.LoginDto;
-import com.cg.crypto_wallet.DTO.ResetPasswordDto;
-import com.cg.crypto_wallet.DTO.RegisterDto;
-import com.cg.crypto_wallet.DTO.ResponseDto;
+import com.cg.crypto_wallet.DTO.*;
 import org.springframework.http.ResponseEntity;
 
 public interface IUserService {
@@ -15,6 +12,8 @@ public interface IUserService {
 //    public void verifyOtp(VerifyOtpDto request);
 //    public void resetPassword(ResetPasswordDto request);
 //    public void ChangePassword(ChangePasswordDto changePasswordDto);
+
+    ResponseDto changePassword(ChangePasswordDto changePasswordDto);
 
     ResponseEntity<?> resetPassword(ResetPasswordDto resetPasswordDto);
     ResponseEntity<?> forgetPassword(String email);
