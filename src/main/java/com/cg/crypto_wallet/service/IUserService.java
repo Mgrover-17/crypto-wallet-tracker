@@ -7,6 +7,8 @@ import com.cg.crypto_wallet.DTO.ResponseDto;
 public interface IUserService {
     public ResponseDto loginUser(LoginDto loginDTO);
     public ResponseDto registerUser(RegisterDto registerDTO);
+
+    public ResponseDto deleteUserById(Long id);
 //    public void initiatePasswordReset(ForgotPasswordDto request);
 //    public void verifyOtp(VerifyOtpDto request);
 //    public void resetPassword(ResetPasswordDto request);

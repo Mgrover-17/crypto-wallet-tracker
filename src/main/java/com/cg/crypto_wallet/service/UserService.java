@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.Optional;
@@ -94,5 +95,16 @@ public class UserService implements IUserService {
     public boolean matchPassword(String rawPassword, String encodedPassword) {
         log.debug("Matching password for login attempt");
         return passwordEncoder.matches(rawPassword, encodedPassword);
+    }
+
+
+    public ResponseDto deleteUserById(Long id){
+        User user = userRepository.findById(id).orElse(null);
+        if (user == null) {
+            ResponseDto res = new ResponseDto("User not found", HttpStatus.NOT_FOUND);
+            return res;
+        }
+        userRepository.delete(user);
+        return new ResponseDto("User Deleted Successfully", HttpStatus.OK);
     }
 }
