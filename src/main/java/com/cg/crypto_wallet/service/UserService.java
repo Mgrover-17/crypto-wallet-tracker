@@ -1,16 +1,16 @@
 package com.cg.crypto_wallet.service;
 
-import com.cg.crypto_wallet.DTO.LoginDto;
-import com.cg.crypto_wallet.DTO.RegisterDto;
-import com.cg.crypto_wallet.DTO.ResponseDto;
+import com.cg.crypto_wallet.DTO.*;
 import com.cg.crypto_wallet.model.User;
 import com.cg.crypto_wallet.repository.UserRepository;
 import com.cg.crypto_wallet.utility.JwtUtility;
+import com.cg.crypto_wallet.utility.OTPGenerator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
 import org.springframework.http.ResponseEntity;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.Optional;
@@ -27,9 +27,14 @@ public class UserService implements IUserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
     @Autowired
     private EmailService emailService;
 
+    @Autowired
+    private OTPGenerator otpGenerator;
+
+    private String otp;
 
     public boolean existsByEmail(String email) {
         log.debug("Checking existence of user by email: {}", email);
@@ -97,8 +102,7 @@ public class UserService implements IUserService {
         return passwordEncoder.matches(rawPassword, encodedPassword);
     }
 
-
-    public ResponseDto deleteUserById(Long id){
+   public ResponseDto deleteUserById(Long id){
         User user = userRepository.findById(id).orElse(null);
         if (user == null) {
             ResponseDto res = new ResponseDto("User not found", HttpStatus.NOT_FOUND);
@@ -107,4 +111,45 @@ public class UserService implements IUserService {
         userRepository.delete(user);
         return new ResponseDto("User Deleted Successfully", HttpStatus.OK);
     }
+
+    @Override
+    public ResponseEntity<?> resetPassword(ResetPasswordDto resetPasswordDto) {
+        String email = resetPasswordDto.getEmail();
+        User user = userRepository.findByEmail(email).orElse(null);
+        //verify otp
+        if(!otp.equals(resetPasswordDto.getOtp())){
+            return new ResponseEntity<>(new ResponseDto("OTP doesn't match.", null), HttpStatus.BAD_REQUEST);
+        }
+        //new password and confirm password match
+        if(!resetPasswordDto.getNewPassword().equals(resetPasswordDto.getConfirmPassword())){
+            return new ResponseEntity<>(new ResponseDto("Confirm Password doesn't match.", null), HttpStatus.BAD_REQUEST);
+        }
+
+        //new password ko encode kra and save kra
+        String encodedPassword=passwordEncoder.encode(resetPasswordDto.getNewPassword());
+        user.setPassword(encodedPassword);
+        userRepository.save(user);
+
+        //otp ko reset krrhe h
+        otp="";
+
+        return new ResponseEntity<>(new ForgetResetResponse("New password updated successfully", user), HttpStatus.OK);
+
+    }
+
+
+    @Override
+    public ResponseEntity<?> forgetPassword(String email) {
+        User user=userRepository.findByEmail(email).orElse(null);
+        if(user==null){
+            log.warn("User not found with email: {}", email);
+            return new ResponseEntity<>("User not found.", HttpStatus.NOT_FOUND);
+        }
+        otp= otpGenerator.generateOTP();
+        emailService.sendEmail(email, "OTP Generated", "OTP to reset password is: "+ otp);
+
+        return new ResponseEntity<>(new ForgetResetResponse("OTP Generated", otp), HttpStatus.OK);
+
+    }
+    
 }
