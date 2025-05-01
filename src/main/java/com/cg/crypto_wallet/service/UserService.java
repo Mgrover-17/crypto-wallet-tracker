@@ -78,7 +78,7 @@ public class UserService implements IUserService {
                 userRepository.save(user);
 
                 log.debug("Login successful for user: {} - Token generated", user.getEmail());
-                emailService.sendEmail(user.getEmail(), "Logged in Employee Payroll Application. You have been successfully logged in", token);
+                emailService.sendEmail(user.getEmail(), "Logged in Crypto-Wallet Application. You have been successfully logged in", token);
                 log.error("User not found with email: {}", loginDTO.getEmail());
                 res.setMessage("message " + token);
                 return res;
