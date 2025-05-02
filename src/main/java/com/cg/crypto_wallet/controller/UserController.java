@@ -31,26 +31,37 @@ class UserController {
 
 
     @DeleteMapping("/deleteUser/{id}")
-    public ResponseDto deleteUser(@PathVariable Long id) {
+    public ResponseDto deleteUser(@Valid @PathVariable Long id) {
         return userService.deleteUserById(id);
 
     }
     @PutMapping("/reset-password")
-    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordDto resetPasswordDto) {
+    public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordDto resetPasswordDto) {
         return userService.resetPassword(resetPasswordDto);
     }
 
     @PostMapping("/forget-password")
-    public ResponseEntity<?> forgetPassword(@RequestBody String email) {
+    public ResponseEntity<?> forgetPassword(@Valid @RequestBody String email) {
         log.info("Forget Password");
         return userService.forgetPassword(email);
 
     }
 
     @PostMapping("/changePassword")
-    public ResponseEntity<ResponseDto> changePassword(@RequestBody ChangePasswordDto changePasswordDto) {
+    public ResponseEntity<ResponseDto> changePassword( @Valid @RequestBody ChangePasswordDto changePasswordDto) {
         ResponseDto response = userService.changePassword(changePasswordDto);
         return ResponseEntity.ok(response);
     }
+
+    @PutMapping("/updateUser/{id}")
+    public ResponseEntity<ResponseDto> updateUserDetails(
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateUserDto updateUserDto) {
+
+        log.info("Updating user details for ID: {}", id);
+        ResponseDto response = userService.updateUserDetails(id, updateUserDto);
+        return ResponseEntity.ok(response);
+    }
+
 
 }
