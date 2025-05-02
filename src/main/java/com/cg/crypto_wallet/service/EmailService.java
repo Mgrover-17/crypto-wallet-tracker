@@ -1,11 +1,14 @@
 package com.cg.crypto_wallet.service;
 
+import com.cg.crypto_wallet.model.Alert;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 public class EmailService {
 
@@ -22,7 +25,38 @@ public class EmailService {
         simpleMailMessage.setTo(toEmail);
         simpleMailMessage.setText(body);
         simpleMailMessage.setSubject(subject);
-        mailSender.send(simpleMailMessage);
-        System.out.println("Mail sent to the user!!");
+
+        try {
+            mailSender.send(simpleMailMessage);
+            System.out.println("Mail successfully sent to " + toEmail);
+        } catch (Exception e) {
+            System.err.println("Failed to send email: " + e.getMessage());
+        }
+    }
+
+    // Specific method for sending alert notification
+    public void sendAlertNotification(Alert alert,double currentPrice) {
+
+        if (alert == null || alert.getUser() == null || alert.getUser().getEmail() == null) {
+            System.err.println("Alert or User email is missing!");
+            return;
+        }
+
+        String toEmail = alert.getUser().getEmail();
+        String subject = "Crypto Alert Triggered for " + alert.getCoinSymbol();
+        String body = "Hello " + alert.getUser().getUsername() + ",\n\n"
+                + "📢 Your Crypto Price Alert has been triggered!\n\n"
+                + "🔔 *Alert Details:*\n"
+                + "• Coin: " + alert.getCoinName() + " (" + alert.getCoinSymbol() + ")\n"
+                + "• Condition: Current Price " + alert.getOperator() + " " + alert.getThreshold() + "\n"
+                + "• Threshold Set: " + alert.getThreshold() + "\n"
+                + "• Current Price: " + currentPrice + "\n\n"
+                + "Thank you for using *Crypto Wallet Tracker*! 🚀\n"
+                + "Stay updated and informed.\n\n"
+                + "--\n"
+                + "Team Crypto Wallet";
+
+        log.info("Sending email to " + toEmail);
+        sendEmail(toEmail, subject, body);
     }
 }
