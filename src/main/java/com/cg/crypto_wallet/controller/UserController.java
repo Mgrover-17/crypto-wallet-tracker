@@ -40,7 +40,7 @@ class UserController {
         return userService.resetPassword(resetPasswordDto);
     }
 
-    @PostMapping("/forget-Password")
+    @PostMapping("/forget-password")
     public ResponseEntity<?> forgetPassword(@RequestBody String email) {
         log.info("Forget Password");
         return userService.forgetPassword(email);
