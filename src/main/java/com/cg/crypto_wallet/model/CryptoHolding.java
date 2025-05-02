@@ -1,12 +1,16 @@
 package com.cg.crypto_wallet.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Data
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
 public class CryptoHolding {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,6 +21,9 @@ public class CryptoHolding {
     private User user;
 
     @Column(nullable = false)
+    private String coinName;
+
+    @Column(nullable = false)
     private String coinSymbol;
 
     @Column(nullable = false)
@@ -25,5 +32,5 @@ public class CryptoHolding {
     @Column(nullable = false)
     private double purchasePrice;
 
-    private LocalDateTime purchaseDate;
+    private LocalDate purchaseDate;
 }

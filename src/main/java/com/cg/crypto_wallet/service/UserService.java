@@ -1,6 +1,7 @@
 package com.cg.crypto_wallet.service;
 
 import com.cg.crypto_wallet.DTO.*;
+import com.cg.crypto_wallet.enums.Role;
 import com.cg.crypto_wallet.model.User;
 import com.cg.crypto_wallet.repository.UserRepository;
 import com.cg.crypto_wallet.utility.JwtUtility;
@@ -52,7 +53,8 @@ public class UserService implements IUserService {
         ResponseDto res = new ResponseDto("", HttpStatus.OK);
         if (existsByEmail(registerDTO.getEmail())) {
             log.warn("registration failed: user already exists with email {}", registerDTO.getEmail());
-            res.setMessage("error");
+            res.setMessage("User Already exist with these credentials");
+            res.setStatus(HttpStatus.BAD_REQUEST);
             return res;
         }
         User user = new User();
@@ -60,9 +62,11 @@ public class UserService implements IUserService {
         user.setEmail(registerDTO.getEmail());
         user.setPassword(registerDTO.getPassword());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setRole(Role.USER);
         userRepository.save(user);
         log.info("user {} registered successfully", user.getEmail());
-        res.setMessage("message");
+        res.setMessage("You have successfully registered to Crypto Wallet Application");
+        res.setStatus(HttpStatus.CREATED);
         return res;
 
     }
@@ -86,15 +90,18 @@ public class UserService implements IUserService {
                 log.debug("Login successful for user: {} - Token generated", user.getEmail());
                 emailService.sendEmail(user.getEmail(), "Logged in Crypto-Wallet Application. You have been successfully logged in", token);
                 log.error("User not found with email: {}", loginDTO.getEmail());
-                res.setMessage("message " + token);
+                res.setMessage("User has Successfully logged in here is the token generated:- " + token);
+                res.setStatus(HttpStatus.OK);
                 return res;
             } else {
                 log.warn("Invalid credentials for user: {}", loginDTO.getEmail());
-                res.setMessage("error");
+                res.setMessage("Wrong Credentials pls fill the details again");
+                res.setStatus(HttpStatus.BAD_REQUEST);
                 return res;
             }
         }
-        res.setMessage("error");
+        res.setMessage("User Does Not Exist");
+        res.setStatus(HttpStatus.BAD_REQUEST);
         return res;
     }
     public boolean matchPassword(String rawPassword, String encodedPassword) {
@@ -132,17 +139,20 @@ public class UserService implements IUserService {
                         "Your password has been successfully changed."
                 );
 
-                res.setMessage("message Password changed successfully.");
+                res.setMessage("Password changed successfully.");
+                res.setStatus(HttpStatus.OK);
                 return res;
             } else {
                 log.warn("Old password mismatch for user: {}", changePasswordDto.getEmail());
                 res.setMessage("error Old password is incorrect.");
+                res.setStatus(HttpStatus.BAD_REQUEST);
                 return res;
             }
         }
 
         log.error("User not found with email: {}", changePasswordDto.getEmail());
-        res.setMessage("error User not found.");
+        res.setMessage("User not found with Credentials");
+        res.setStatus(HttpStatus.BAD_REQUEST);
         return res;
     }
 
@@ -164,7 +174,7 @@ public class UserService implements IUserService {
         user.setPassword(encodedPassword);
         userRepository.save(user);
 
-        //otp ko reset krrhe h
+        //otp Reset
         otp="";
 
         return new ResponseEntity<>(new ForgetResetResponse("New password updated successfully", user), HttpStatus.OK);
@@ -185,5 +195,19 @@ public class UserService implements IUserService {
         return new ResponseEntity<>(new ForgetResetResponse("OTP Generated", otp), HttpStatus.OK);
 
     }
-    
+
+    //updateUser
+    @Override
+    public ResponseDto updateUserDetails(Long id, UpdateUserDto updateUserDto) {
+        Optional<User> user = userRepository.findById(id);
+        if(user.isPresent()){
+            User user1 = user.get();
+            user1.setUsername(updateUserDto.getUsername());
+            user1.setEmail(updateUserDto.getEmail());
+            userRepository.save(user1);
+        }
+        return new ResponseDto("User updated successfully", HttpStatus.OK);
+    }
+
+
 }

@@ -1,5 +1,6 @@
 package com.cg.crypto_wallet.model;
 
+import com.cg.crypto_wallet.enums.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -11,8 +12,6 @@ import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
-
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -29,7 +28,7 @@ public class User implements UserDetails {
 
     @NotBlank(message = "Username is required")
     @Size(min = 3, max = 20, message = "Username must be between 3 to 20 characters")
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String username;
 
     @NotBlank(message = "Email is required")
@@ -48,14 +47,15 @@ public class User implements UserDetails {
 
     private String token;
 
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.emptyList(); // No roles for now
     }
 }
-//    @Enumerated(EnumType.STRING)
-//    private Role role;
-//
+
 //    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
 //    private List<CryptoHolding> holdings;
 //
