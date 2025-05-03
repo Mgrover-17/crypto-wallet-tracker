@@ -50,11 +50,10 @@ public class UserService implements IUserService {
     @Override
     public ResponseDto registerUser(RegisterDto registerDTO) {
         log.info("Registering user:{}", registerDTO.getEmail());
-        ResponseDto res = new ResponseDto("", HttpStatus.OK);
+        ResponseDto res = new ResponseDto("Registration","Initiating User Registration..." );
         if (existsByEmail(registerDTO.getEmail())) {
             log.warn("registration failed: user already exists with email {}", registerDTO.getEmail());
             res.setMessage("User Already exist with these credentials");
-            res.setStatus(HttpStatus.BAD_REQUEST);
             return res;
         }
         User user = new User();
@@ -66,7 +65,7 @@ public class UserService implements IUserService {
         userRepository.save(user);
         log.info("user {} registered successfully", user.getEmail());
         res.setMessage("You have successfully registered to Crypto Wallet Application");
-        res.setStatus(HttpStatus.CREATED);
+        res.setData(user);
         return res;
 
     }
@@ -75,7 +74,7 @@ public class UserService implements IUserService {
     @Override
     public ResponseDto loginUser(LoginDto loginDTO) {
         log.info("Login attempt for user: {}", loginDTO.getEmail());
-        ResponseDto res = new ResponseDto("", HttpStatus.OK);
+        ResponseDto res = new ResponseDto("Login", "Initiating Login process...");
         Optional<User> userExists = getUserByEmail(loginDTO.getEmail());
 
         if (userExists.isPresent()) {
@@ -90,18 +89,18 @@ public class UserService implements IUserService {
                 log.debug("Login successful for user: {} - Token generated", user.getEmail());
                 emailService.sendEmail(user.getEmail(), "Logged in Crypto-Wallet Application. You have been successfully logged in", token);
                 log.error("User not found with email: {}", loginDTO.getEmail());
-                res.setMessage("User has Successfully logged in here is the token generated:- " + token);
-                res.setStatus(HttpStatus.OK);
+                res.setMessage("User has Successfully logged in here is the token generated:- ");
+                res.setData(token);
                 return res;
             } else {
                 log.warn("Invalid credentials for user: {}", loginDTO.getEmail());
-                res.setMessage("Wrong Credentials pls fill the details again");
-                res.setStatus(HttpStatus.BAD_REQUEST);
+                res.setMessage("Wrong Credentials");
+                res.setData("Pls re-fill your details");
                 return res;
             }
         }
-        res.setMessage("User Does Not Exist");
-        res.setStatus(HttpStatus.BAD_REQUEST);
+        res.setMessage("No data found");
+        res.setData("User does not exist in Database");
         return res;
     }
     public boolean matchPassword(String rawPassword, String encodedPassword) {
@@ -112,17 +111,17 @@ public class UserService implements IUserService {
    public ResponseDto deleteUserById(Long id){
         User user = userRepository.findById(id).orElse(null);
         if (user == null) {
-            ResponseDto res = new ResponseDto("User not found", HttpStatus.NOT_FOUND);
+            ResponseDto res = new ResponseDto("Not Found","User not present in Database");
             return res;
         }
         userRepository.delete(user);
-        return new ResponseDto("User Deleted Successfully", HttpStatus.OK);
+        return new ResponseDto("Deletion","User Deleted Successfully");
     }
 
     @Override
     public ResponseDto changePassword(ChangePasswordDto changePasswordDto) {
         log.info("Change password attempt for user: {}", changePasswordDto.getEmail());
-        ResponseDto res = new ResponseDto("", HttpStatus.OK);
+        ResponseDto res = new ResponseDto("Change Password","Intiating the Password Changes");
         Optional<User> userExists = getUserByEmail(changePasswordDto.getEmail());
 
         if (userExists.isPresent()) {
@@ -139,20 +138,20 @@ public class UserService implements IUserService {
                         "Your password has been successfully changed."
                 );
 
-                res.setMessage("Password changed successfully.");
-                res.setStatus(HttpStatus.OK);
+                res.setMessage("Change Password.");
+                res.setData("User Changed the password Successfully");
                 return res;
             } else {
                 log.warn("Old password mismatch for user: {}", changePasswordDto.getEmail());
                 res.setMessage("error Old password is incorrect.");
-                res.setStatus(HttpStatus.BAD_REQUEST);
+                res.setData("Old password does not match with one present in Database");
                 return res;
             }
         }
 
         log.error("User not found with email: {}", changePasswordDto.getEmail());
-        res.setMessage("User not found with Credentials");
-        res.setStatus(HttpStatus.BAD_REQUEST);
+        res.setMessage("No such Credentials");
+        res.setData("User not found with theses Credentials in Database");
         return res;
     }
 
@@ -160,41 +159,49 @@ public class UserService implements IUserService {
     public ResponseEntity<?> resetPassword(ResetPasswordDto resetPasswordDto) {
         String email = resetPasswordDto.getEmail();
         User user = userRepository.findByEmail(email).orElse(null);
-        //verify otp
-        if(!otp.equals(resetPasswordDto.getOtp())){
-            return new ResponseEntity<>(new ResponseDto("OTP doesn't match.", null), HttpStatus.BAD_REQUEST);
-        }
-        //new password and confirm password match
-        if(!resetPasswordDto.getNewPassword().equals(resetPasswordDto.getConfirmPassword())){
-            return new ResponseEntity<>(new ResponseDto("Confirm Password doesn't match.", null), HttpStatus.BAD_REQUEST);
+
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ResponseDto("User not found.", "No such user in Database"));
         }
 
-        //new password ko encode kra and save kra
-        String encodedPassword=passwordEncoder.encode(resetPasswordDto.getNewPassword());
+        // verify OTP
+        if (!otp.equals(resetPasswordDto.getOtp())) {
+            return ResponseEntity.badRequest()
+                    .body(new ResponseDto("Mismatch otp", "OTP doesn't match"));
+        }
+
+        // check new password and confirm password match
+        if (!resetPasswordDto.getNewPassword().equals(resetPasswordDto.getConfirmPassword())) {
+            return ResponseEntity.badRequest()
+                    .body(new ResponseDto("Password matching fault", "Confirm Password doesn't match."));
+        }
+
+        // encode new password and save
+        String encodedPassword = passwordEncoder.encode(resetPasswordDto.getNewPassword());
         user.setPassword(encodedPassword);
         userRepository.save(user);
 
-        //otp Reset
-        otp="";
+        // reset OTP
+        otp = "";
 
-        return new ResponseEntity<>(new ForgetResetResponse("New password updated successfully", user), HttpStatus.OK);
-
+        return ResponseEntity.ok(new ResponseDto("New password updated successfully", user));
     }
-
-
     @Override
     public ResponseEntity<?> forgetPassword(String email) {
-        User user=userRepository.findByEmail(email).orElse(null);
-        if(user==null){
+        User user = userRepository.findByEmail(email).orElse(null);
+        if (user == null) {
             log.warn("User not found with email: {}", email);
-            return new ResponseEntity<>("User not found.", HttpStatus.NOT_FOUND);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ResponseDto("User not found.", "No such User present in Database"));
         }
-        otp= otpGenerator.generateOTP();
-        emailService.sendEmail(email, "OTP Generated", "OTP to reset password is: "+ otp);
 
-        return new ResponseEntity<>(new ForgetResetResponse("OTP Generated", otp), HttpStatus.OK);
+        otp = otpGenerator.generateOTP();
+        emailService.sendEmail(email, "OTP Generated", "OTP to reset password is: " + otp);
 
+        return ResponseEntity.ok(new ResponseDto("OTP Generated", otp));
     }
+
 
     //updateUser
     @Override
@@ -206,7 +213,7 @@ public class UserService implements IUserService {
             user1.setEmail(updateUserDto.getEmail());
             userRepository.save(user1);
         }
-        return new ResponseDto("User updated successfully", HttpStatus.OK);
+        return new ResponseDto("User updated successfully", "Updated the user Data in Database");
     }
 
 
