@@ -34,11 +34,11 @@ public class AdminController {
         if (!userRepository.existsById(id)) {
             log.info("User not found with the Id");
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ResponseDto("User not found with ID: " + id, HttpStatus.BAD_REQUEST));
+                    .body(new ResponseDto("User not found with ID: " + id, "No such user in Database"));
         }
 
         userRepository.deleteById(id);
         log.info("User Deleted with the given id");
-        return ResponseEntity.ok(new ResponseDto("User deleted successfully", HttpStatus.OK));
+        return ResponseEntity.ok(new ResponseDto("User deleted successfully", "Deleted user from Database"));
     }
 }

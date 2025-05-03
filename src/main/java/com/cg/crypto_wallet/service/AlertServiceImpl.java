@@ -1,9 +1,11 @@
 package com.cg.crypto_wallet.service;
 
+import com.cg.crypto_wallet.exceptions.CryptoWalletException;
 import com.cg.crypto_wallet.model.Alert;
-import com.cg.crypto_wallet.model.MockCoinPrice;
+import com.cg.crypto_wallet.model.CoinPrice;
 import com.cg.crypto_wallet.model.User;
 import com.cg.crypto_wallet.repository.AlertRepository;
+import com.cg.crypto_wallet.repository.CoinPriceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,13 +19,16 @@ public class AlertServiceImpl implements IAlertService {
     private AlertRepository alertRepository;
 
     @Autowired
-    private MockCoinPriceService mockCoinPriceService; // Service to get the latest coin prices
+    private CoinPriceRepository coinPriceRepository;
 
     @Autowired
     private EmailService emailService; // Service to handle email notifications
 
     @Override
     public Alert createAlert(Alert alert) {
+        if (alert.getThreshold() <= 0) {
+            throw new CryptoWalletException("Threshold value must be greater than 0");
+        }
         // Save the new alert in the database
         return alertRepository.save(alert);
     }
@@ -44,7 +49,7 @@ public class AlertServiceImpl implements IAlertService {
     public Alert updateAlert(Long alertId, Alert updatedAlert) {
         // Find the existing alert by ID
         Alert existingAlert = alertRepository.findById(alertId)
-                .orElseThrow(() -> new IllegalArgumentException("Alert not found"));
+                .orElseThrow(() -> new CryptoWalletException("Alert not found with ID: " + alertId));
 
         // Update the alert fields
         existingAlert.setCoinName(updatedAlert.getCoinName());
@@ -55,42 +60,6 @@ public class AlertServiceImpl implements IAlertService {
 
         // Save the updated alert in the database
         return alertRepository.save(existingAlert);
-    }
-
-
-    @Override
-    @Transactional
-    public void evaluateAlerts() {
-        // Fetch all active alerts
-        List<Alert> activeAlerts = alertRepository.findByActiveTrue();
-
-        // Loop through each alert and evaluate if the condition is met
-        for (Alert alert : activeAlerts) {
-            // Fetch the current price for the coin
-            MockCoinPrice mockCoinPrice=mockCoinPriceService.getPrice(alert.getCoinSymbol());
-
-            // Evaluate if the alert condition is met (based on operator)
-            if (evaluateCondition(alert, mockCoinPrice)) {
-                // Send email notification to the user
-                sendEmailNotification(alert, mockCoinPrice.getPrice());
-                alert.setActive(false);
-                alertRepository.save(alert);
-            }
-        }
-    }
-
-    private boolean evaluateCondition(Alert alert, MockCoinPrice mockCoinPrice) {
-        double currentPrice = mockCoinPrice.getPrice();
-
-        // Check the condition based on the alert operator (e.g., >, <)
-        switch (alert.getOperator()) {
-            case ">":
-                return currentPrice > alert.getThreshold();
-            case "<":
-                return currentPrice < alert.getThreshold();
-            default:
-                return false;
-        }
     }
 
     private void sendEmailNotification(Alert alert,double currentPrice) {
