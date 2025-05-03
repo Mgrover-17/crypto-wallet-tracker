@@ -24,13 +24,13 @@ public class CryptoWalletExceptionHandler {
                 .map(ObjectError::getDefaultMessage)
                 .collect(Collectors.toList());
 
-        ResponseDto respDTO = new ResponseDto(message, HttpStatus.BAD_REQUEST);
+        ResponseDto respDTO = new ResponseDto(message,errMsg);
         return new ResponseEntity<>(respDTO, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(CryptoWalletException.class)
     public ResponseEntity<ResponseDto> handleCryptoWalletException(CryptoWalletException exception) {
-        ResponseDto respDTO = new ResponseDto("Error: " + exception.getMessage(), null);
+        ResponseDto respDTO = new ResponseDto("Error: " ,exception.getMessage());
         return new ResponseEntity<>(respDTO, HttpStatus.BAD_REQUEST);
     }
 }
