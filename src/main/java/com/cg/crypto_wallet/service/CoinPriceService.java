@@ -55,22 +55,22 @@ public class CoinPriceService implements ICoinPriceService {
                     log.info("Price updated: " + name + " " + symbol + " " + price);
 
                 } else {
-                    System.err.println("❌ Failed response for " + coinId + ": " + response.getStatusCode());
+                    System.err.println("Failed response for " + coinId + ": " + response.getStatusCode());
                 }
 
             } catch (Exception e) {
-                System.err.println("❌ Exception for coin " + coinId + ": " + e.getMessage());
+                System.err.println("Exception for coin " + coinId + ": " + e.getMessage());
             }
         }
 
-        System.out.println("✅ Prices, names & symbols updated from /coins/{id} endpoint");
+        System.out.println("Prices, names & symbols updated from /coins/{id} endpoint");
     }
 
     private void updateOrCreate(String symbol, String name, double price) {
         CoinPrice coin = new CoinPrice();
         coin.setSymbol(symbol);
         coin.setName(name);
-        coin.setPrice(BigDecimal.valueOf(price));
+        coin.setPrice(price);
         coin.setLastUpdatedTime(LocalDateTime.now());
         coinPriceRepository.save(coin);
     }

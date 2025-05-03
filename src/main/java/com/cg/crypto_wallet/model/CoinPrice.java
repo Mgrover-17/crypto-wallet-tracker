@@ -20,7 +20,7 @@ public class CoinPrice {
 
     private String name;
 
-    private BigDecimal price;
+    private double price;
 
     private LocalDateTime lastUpdatedTime;
 

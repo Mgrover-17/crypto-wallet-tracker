@@ -19,6 +19,4 @@ public interface IAlertService {
     // Update an alert
     Alert updateAlert(Long alertId, Alert updatedAlert);
 
-    // Evaluate alerts based on price
-    void evaluateAlerts();
 }
