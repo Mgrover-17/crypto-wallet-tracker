@@ -31,7 +31,7 @@ public class CoinPriceService implements ICoinPriceService {
     private final List<String> coinIds = List.of("bitcoin", "ethereum");
 
     // 🕒 Every 1 minutes (uncomment when needed)
-     @Scheduled(cron = "0 */1 * * * *")
+//     @Scheduled(cron = "0 */1 * * * *")
     public void fetchAndUpdatePrices() {
         for (String coinId : coinIds) {
             try {

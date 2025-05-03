@@ -18,7 +18,7 @@ public class UpdateUserDto {
     @NotBlank(message = "Username is required")
     @Size(min = 3, max = 20, message = "Username must be between 3 to 20 characters")
     @Column(nullable = false)
-    private String username;
+    private String name;
     @NotBlank(message = "Email is required")
     @Pattern(
             regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$",

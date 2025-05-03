@@ -18,7 +18,7 @@ public class DataSeeder {
 
             if (userRepository.findByEmail(adminEmail).isEmpty()) {
                 User admin = new User();
-                admin.setUsername("Admin User");
+                admin.setName("Admin");
                 admin.setEmail(adminEmail);
                 admin.setPassword(passwordEncoder.encode("admin@123"));
                 admin.setRole(Role.ADMIN);

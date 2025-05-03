@@ -14,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 @Validated
 @Data
@@ -29,7 +30,7 @@ public class User implements UserDetails {
     @NotBlank(message = "Username is required")
     @Size(min = 3, max = 20, message = "Username must be between 3 to 20 characters")
     @Column(nullable = false)
-    private String username;
+    private String name;
 
     @NotBlank(message = "Email is required")
     @Pattern(
@@ -50,14 +51,19 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<CryptoHolding1> holdings;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.emptyList(); // No roles for now
     }
+
+    public String getUsername() {
+        return email;
+    }
 }
 
-//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-//    private List<CryptoHolding> holdings;
 //
 //    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
 //    private List<Alert> alerts;

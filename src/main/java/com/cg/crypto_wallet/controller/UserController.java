@@ -44,7 +44,6 @@ class UserController {
     public ResponseEntity<?> forgetPassword(@Valid @RequestBody String email) {
         log.info("Forget Password");
         return userService.forgetPassword(email);
-
     }
 
     @PostMapping("/changePassword")

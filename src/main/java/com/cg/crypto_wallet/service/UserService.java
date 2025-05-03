@@ -58,7 +58,7 @@ public class UserService implements IUserService {
             return res;
         }
         User user = new User();
-        user.setUsername(registerDTO.getFullname());
+        user.setName(registerDTO.getFullname());
         user.setEmail(registerDTO.getEmail());
         user.setPassword(registerDTO.getPassword());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -89,7 +89,7 @@ public class UserService implements IUserService {
 
                 log.debug("Login successful for user: {} - Token generated", user.getEmail());
                 emailService.sendEmail(user.getEmail(), "Logged in Crypto-Wallet Application. You have been successfully logged in", token);
-                log.error("User not found with email: {}", loginDTO.getEmail());
+//                log.error("User not found with email: {}", loginDTO.getEmail());
                 res.setMessage("User has Successfully logged in here is the token generated:- " + token);
                 res.setStatus(HttpStatus.OK);
                 return res;
@@ -193,7 +193,6 @@ public class UserService implements IUserService {
         emailService.sendEmail(email, "OTP Generated", "OTP to reset password is: "+ otp);
 
         return new ResponseEntity<>(new ForgetResetResponse("OTP Generated", otp), HttpStatus.OK);
-
     }
 
     //updateUser
@@ -202,7 +201,7 @@ public class UserService implements IUserService {
         Optional<User> user = userRepository.findById(id);
         if(user.isPresent()){
             User user1 = user.get();
-            user1.setUsername(updateUserDto.getUsername());
+            user1.setName(updateUserDto.getName());
             user1.setEmail(updateUserDto.getEmail());
             userRepository.save(user1);
         }
