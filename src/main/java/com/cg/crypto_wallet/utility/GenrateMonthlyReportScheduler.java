@@ -40,7 +40,7 @@ public class GenrateMonthlyReportScheduler {
 
                 if (report != null && report.length > 0) {
                     String subject = "Your Credit Report Summary for " + lastMonth.getMonth() + " " + lastMonth.getYear();
-                    String body = "Dear " + user.getName() + ",\n\nPlease find attached your credit report summary for " + lastMonth.getMonth() + " " + lastMonth.getYear() + ".\n\nRegards,\nCredit Metrics Team";
+                    String body = "Dear " + user.getName() + ",\n\nPlease find attached portfolio summary for " + lastMonth.getMonth() + " " + lastMonth.getYear() + ".\n\nRegards,\nCredit Metrics Team";
 
                     emailService.sendEmailWithAttachment(user.getEmail(), subject, body, report, "Wallet-Report_" + lastMonth +"_"+ user.getName()  + ".pdf");
 
