@@ -1,11 +1,16 @@
 package com.cg.crypto_wallet.service;
 
 import com.cg.crypto_wallet.model.Alert;
+import com.cg.crypto_wallet.model.User;
+import com.cg.crypto_wallet.repository.UserRepository;
+import jakarta.activation.DataSource;
+import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.util.ByteArrayDataSource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.InputStreamSource;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -17,6 +22,9 @@ public class EmailService {
 
     @Autowired
     JavaMailSender mailSender;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Value("${spring.mail.username}")
     private String fromEmail;
@@ -63,28 +71,26 @@ public class EmailService {
         sendEmail(toEmail, subject, body);
     }
 
+    public void sendAttachment(String username, byte[] data, String filename, String contentType) {
+        User user = userRepository.findByEmail(username).orElseThrow();
 
-    // Send Mail with Report
-    public void sendEmailWithAttachment(String to, String subject, String body, byte[] attachmentData, String filename) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
-            helper.setFrom(fromEmail);
-            helper.setTo(to);
-            helper.setSubject(subject);
-            helper.setText(body);
+            helper.setTo(user.getEmail());
+            helper.setSubject("Your Crypto Wallet Summary Report");
+            helper.setText("Hello " + user.getUsername() + ",\n\nPlease find attached your crypto wallet summary report.\n\nBest regards,\nCrypto Tracker Team");
 
-            helper.addAttachment(filename, new ByteArrayDataSource(attachmentData, "application/pdf"));
+            helper.addAttachment(filename, new ByteArrayDataSource(data, contentType));
 
-            log.info("Sending email with attachment to: {}", to);
+//            ByteArrayDataSource dataSource = new ByteArrayDataSource(data, contentType);
+//            helper.addAttachment(filename, dataSource);
+
             mailSender.send(message);
-            log.info("Email with attachment sent successfully");
-
         } catch (Exception e) {
-            log.error("Failed to send email with attachment to {}: {}", to, e.getMessage(), e);
+            throw new RuntimeException("Failed to send email", e);
         }
     }
-
 
 }
