@@ -50,12 +50,15 @@ public class UserService implements IUserService {
     @Override
     public ResponseDto registerUser(RegisterDto registerDTO) {
         log.info("Registering user:{}", registerDTO.getEmail());
+
         ResponseDto res = new ResponseDto("Registration","Initiating User Registration..." );
+
         if (existsByEmail(registerDTO.getEmail())) {
             log.warn("registration failed: user already exists with email {}", registerDTO.getEmail());
             res.setMessage("User Already exist with these credentials");
             return res;
         }
+
         User user = new User();
         user.setName(registerDTO.getFullname());
         user.setEmail(registerDTO.getEmail());

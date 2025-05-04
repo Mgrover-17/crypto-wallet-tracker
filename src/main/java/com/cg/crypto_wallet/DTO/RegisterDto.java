@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class RegisterDto {
     @NotBlank(message = "Username is required")
-    @Size(min = 3, max = 20, message = "Username must be between 3 to 20 characters")
+    @Size(min = 3, max = 20, message = "Fullname must be between 3 to 20 characters")
     @Column(nullable = false)
     private String fullname;
 
