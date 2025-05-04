@@ -4,6 +4,7 @@ import com.cg.crypto_wallet.DTO.CryptoHoldingsDto;
 import com.cg.crypto_wallet.service.CryptoholdingService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -13,7 +14,7 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/holdings")
+@RequestMapping("/api/wallet")
 public class CryptoholdingController {
 
     @Autowired
@@ -47,9 +48,9 @@ public class CryptoholdingController {
 
     // ✅ Delete a holding
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteHolding(@PathVariable Long id, Principal principal) {
+    public ResponseEntity<String> deleteHolding(@PathVariable Long id, Principal principal) {
         String email = principal.getName();
         service.deleteHolding(email, id);
-        return ResponseEntity.noContent().build();
+        return new ResponseEntity<>("Successfully Deleted", HttpStatus.OK);
     }
 }

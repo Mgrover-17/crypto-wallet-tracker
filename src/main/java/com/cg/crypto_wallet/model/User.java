@@ -1,6 +1,8 @@
 package com.cg.crypto_wallet.model;
 
 import com.cg.crypto_wallet.enums.Role;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -54,6 +56,11 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<CryptoHolding1> holdings;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private List<Alert> alerts;
+
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.emptyList(); // No roles for now
@@ -65,8 +72,6 @@ public class User implements UserDetails {
 }
 
 //
-//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-//    private List<Alert> alerts;
 //
 //    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
 //    private List<Transaction> transactions;

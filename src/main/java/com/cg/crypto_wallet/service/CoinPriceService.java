@@ -2,6 +2,7 @@ package com.cg.crypto_wallet.service;
 
 import com.cg.crypto_wallet.model.CoinPrice;
 import com.cg.crypto_wallet.repository.CoinPriceRepository;
+import com.cg.crypto_wallet.repository.CryptoHoldingsRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -24,15 +25,26 @@ public class CoinPriceService implements ICoinPriceService {
     @Autowired
     private CoinPriceRepository coinPriceRepository;
 
+    @Autowired
+    private CryptoHoldingsRepository holdingsRepository;
+
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper mapper = new ObjectMapper();
 
     private static final String API_KEY = "CG-yFZBzE34DfhhzWMT9KDN7RoG";
-    private final List<String> coinIds = List.of("bitcoin", "ethereum");
+
+//    private final List<String> coinIds = List.of("bitcoin", "ethereum");
+
+
 
     // 🕒 Every 1 minutes (uncomment when needed)
 //     @Scheduled(cron = "0 */1 * * * *")
     public void fetchAndUpdatePrices() {
+    //  Fetch distinct coin names from the CryptoHoldings table
+        List<String> coinIds = holdingsRepository.findDistinctCoinNames();
+
+        log.info(coinIds.toString());
+
         for (String coinId : coinIds) {
             try {
                 String url = "https://api.coingecko.com/api/v3/coins/" + coinId;

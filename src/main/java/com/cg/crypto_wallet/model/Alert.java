@@ -1,5 +1,6 @@
 package com.cg.crypto_wallet.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
@@ -18,7 +19,7 @@ public class Alert {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long alert_id;
 
     @NotBlank(message = "Coin name cannot be blank") // Ensures coin name is not empty or null
     @Column(name="coin_name", nullable = false)
@@ -43,5 +44,6 @@ public class Alert {
     @ManyToOne
     @JoinColumn(name = "user_id")
     @NotNull(message = "User must be provided") // Ensures user is not null
+    @JsonBackReference
     private User user;
 }

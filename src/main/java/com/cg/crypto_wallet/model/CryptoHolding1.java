@@ -1,5 +1,6 @@
 package com.cg.crypto_wallet.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.PastOrPresent;
@@ -19,7 +20,7 @@ public class CryptoHolding1 {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long cryptoId;
 
     @NotBlank(message = "Coin name is required")
     private String coinName;
@@ -38,5 +39,6 @@ public class CryptoHolding1 {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnore
     private User user;
 }

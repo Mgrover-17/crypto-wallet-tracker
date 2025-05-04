@@ -27,7 +27,7 @@ public class AlertCheckerJob {
 
 
     // This will run every 1 minute (60000 ms)
-    @Scheduled(cron = "0 0/1 * * * ?")
+//    @Scheduled(cron = "0 0/1 * * * ?")
     public void checkAlerts() {
         List<Alert> activeAlerts = alertRepository.findByActiveTrue();
 
@@ -64,7 +64,7 @@ public class AlertCheckerJob {
                 }
 
             } catch (Exception e) {
-                System.err.println("Error while processing alert ID: " + alert.getId() + " — " + e.getMessage());
+                System.err.println("Error while processing alert ID: " + alert.getAlert_id() + " — " + e.getMessage());
                 e.printStackTrace(); // Optionally log using a logger
             }
         }
