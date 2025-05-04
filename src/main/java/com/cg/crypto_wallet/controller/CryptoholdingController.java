@@ -20,7 +20,7 @@ public class CryptoholdingController {
     @Autowired
     private CryptoholdingService service;
 
-    // ✅ Add a new holding
+    //  Add a new holding
     @PostMapping
     public ResponseEntity<CryptoHoldingsDto> addHolding(@RequestBody CryptoHoldingsDto dto, Principal principal) {
         log.info("Hello starting point ");
@@ -29,24 +29,25 @@ public class CryptoholdingController {
         return ResponseEntity.ok(service.addHolding(email, dto));
     }
 
-    // ✅ Get all holdings for logged-in user
+    // Get all holdings for logged-in user
     @GetMapping
     public ResponseEntity<List<CryptoHoldingsDto>> getHoldings(Principal principal) {
         String email = principal.getName();
         return ResponseEntity.ok(service.getHoldings(email));
     }
 
-    // ✅ Update a holding
+    //  Update a holding
     @PutMapping("/{id}")
     public ResponseEntity<CryptoHoldingsDto> updateHolding(
             @PathVariable Long id,
             @RequestBody CryptoHoldingsDto dto,
             Principal principal) {
         String email = principal.getName();
+        log.info("PUT /api/wallet/{} called by: {}", id, email);
         return ResponseEntity.ok(service.updateHolding(email, id, dto));
     }
 
-    // ✅ Delete a holding
+    //  Delete a holding
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteHolding(@PathVariable Long id, Principal principal) {
         String email = principal.getName();

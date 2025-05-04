@@ -28,6 +28,8 @@ public class SummaryService implements ISummaryService {
     @Override
     public SummaryResponseDto calculateSummary(User user) {
         // Get holdings only for the logged-in user
+        log.info("Calculating summary for user: " + user.getId());
+
         List<CryptoHoldings> holdings = holdingRepository.findByUser(user);
         List<CoinSummaryDto> coinSummaries = new ArrayList<>();
 
@@ -41,7 +43,7 @@ public class SummaryService implements ISummaryService {
 
             CoinPrice price = coinPriceRepository.findById(coin).orElse(null);
             if (price == null) {
-                log.error("CoinPrice not found for " + coin);
+                log.error("CoinPrice not found for coin: " + coin + " for user: " + user.getId());
                 continue;
             }
 
@@ -50,6 +52,9 @@ public class SummaryService implements ISummaryService {
             double currentValue = units * currentPrice;
             double gainLoss = currentValue - totalBuy;
             double gainLossPercent = totalBuy == 0 ? 0 : (gainLoss / totalBuy) * 100;
+
+            log.info("Processing coin: " + coin + " | Buy Value: " + totalBuy + " | Current Value: " + currentValue +
+                    " | Gain/Loss: " + gainLoss + " | Gain/Loss Percent: " + gainLossPercent);
 
             CoinSummaryDto dto = new CoinSummaryDto(
                     coin, units, buyPrice, totalBuy,

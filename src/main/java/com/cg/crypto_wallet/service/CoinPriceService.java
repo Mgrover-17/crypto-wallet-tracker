@@ -84,10 +84,18 @@ public class CoinPriceService implements ICoinPriceService {
         coin.setName(name);
         coin.setPrice(price);
         coin.setLastUpdatedTime(LocalDateTime.now());
-        coinPriceRepository.save(coin);
+        try {
+            coinPriceRepository.save(coin);
+            log.info("Coin entry for {} saved/updated successfully", symbol);
+        } catch (Exception e) {
+            log.error("Error saving coin data for {}: {}", symbol, e.getMessage());
+            throw new RuntimeException("Error saving coin data to database", e);
+        }
     }
 
     public Optional<CoinPrice> getPrice(String symbol) {
+        log.info("Fetching price for coin symbol: {}", symbol);
+
         return coinPriceRepository.findById(symbol);
     }
 }

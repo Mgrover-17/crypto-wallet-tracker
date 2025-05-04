@@ -67,7 +67,7 @@ public class AlertController {
 //        log.info("found user: " + user);
 //        return alertService.getActiveAlertsForUser(user);
 //    }
-
+//
 //    @GetMapping("/my-alerts")
 //    public List<Alert> getMyActiveAlerts(Principal principal) {
 //

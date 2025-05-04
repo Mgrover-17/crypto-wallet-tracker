@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RestControllerAdvice
 public class CryptoWalletExceptionHandler {
 
@@ -37,5 +38,11 @@ public class CryptoWalletExceptionHandler {
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<String> handleResourceNotFound(ResourceNotFoundException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ResponseDto> handleOthers(Exception ex) {
+        log.error("Unhandled Exception: ", ex);
+        return new ResponseEntity<>(new ResponseDto("Internal Error", ex.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

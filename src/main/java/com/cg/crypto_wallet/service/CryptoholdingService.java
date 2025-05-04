@@ -1,6 +1,8 @@
 package com.cg.crypto_wallet.service;
 
 import com.cg.crypto_wallet.DTO.CryptoHoldingsDto;
+import com.cg.crypto_wallet.exceptions.CryptoWalletException;
+import com.cg.crypto_wallet.exceptions.ResourceNotFoundException;
 import com.cg.crypto_wallet.model.CryptoHoldings;
 import com.cg.crypto_wallet.model.User;
 import com.cg.crypto_wallet.repository.CryptoHoldingsRepository;
@@ -25,6 +27,11 @@ public class CryptoholdingService implements ICryptoholdingService{
     @Override
     public CryptoHoldingsDto addHolding(String email, CryptoHoldingsDto dto) {
         User user = getUserByEmail(email);
+        log.info("Adding new holding for user: {}", email);
+
+        if (dto.getUnits() <= 0) {
+            throw new CryptoWalletException("Units must be greater than 0");
+        }
 
         CryptoHoldings holding = new CryptoHoldings();
         holding.setCoinName(dto.getCoinName());
@@ -42,6 +49,7 @@ public class CryptoholdingService implements ICryptoholdingService{
     @Override
     public List<CryptoHoldingsDto> getHoldings(String email) {
         User user = getUserByEmail(email);
+        log.info("Fetching holdings for user: {}", email);
 
         return repository.findByUser(user).stream()
                 .map(holding -> {
@@ -60,12 +68,11 @@ public class CryptoholdingService implements ICryptoholdingService{
     @Override
     public CryptoHoldingsDto updateHolding(String email, Long id, CryptoHoldingsDto dto) {
         User user = getUserByEmail(email);
-
-        log.info("user found: " + user);
+        log.info("Updating holding ID: {} for user: {}", id, email);
 
         CryptoHoldings holding = repository.findById(id)
                 .filter(h -> h.getUser().getId().equals(user.getId()))
-                .orElseThrow(() -> new RuntimeException("Holding not found or access denied"));
+                .orElseThrow(() -> new ResourceNotFoundException("Holding not found or access denied"));
 
         holding.setCoinName(dto.getCoinName());
         holding.setCoinSymbol(dto.getCoinSymbol());
@@ -75,22 +82,27 @@ public class CryptoholdingService implements ICryptoholdingService{
 
         repository.save(holding);
         dto.setCryptoId(holding.getCryptoId());
+        log.debug("Updated holding: {}", holding);
         return dto;
     }
 
     @Override
     public void deleteHolding(String email, Long id) {
         User user = getUserByEmail(email);
+        log.info("Attempting to delete holding ID: {} for user: {}", id, email);
 
         CryptoHoldings holding = repository.findById(id)
                 .filter(h -> h.getUser().getId().equals(user.getId()))
-                .orElseThrow(() -> new RuntimeException("Holding not found or access denied"));
+                .orElseThrow(() -> new ResourceNotFoundException("Holding not found or access denied"));
+
+        log.debug("Checking if user ID {} matches holding user ID {}", user.getId(), holding.getUser().getId());
 
         repository.delete(holding);
+        log.info("Deleted holding: {}", id);
     }
 
     private User getUserByEmail(String email) {
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
     }
 }
