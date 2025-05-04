@@ -27,7 +27,7 @@ public class AlertCheckerJob {
 
 
     // This will run every 1 minute (60000 ms)
-//    @Scheduled(cron = "0 0/1 * * * ?")
+    //@Scheduled(cron = "0 0/1 * * * ?")
     public void checkAlerts() {
         List<Alert> activeAlerts = alertRepository.findByActiveTrue();
 
