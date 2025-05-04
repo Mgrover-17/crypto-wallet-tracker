@@ -16,7 +16,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Entity
 @Table(name = "crypto_holdings")
-public class CryptoHolding1 {
+public class CryptoHoldings {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

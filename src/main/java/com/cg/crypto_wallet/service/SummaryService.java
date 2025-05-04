@@ -4,7 +4,7 @@ package com.cg.crypto_wallet.service;
 import com.cg.crypto_wallet.DTO.CoinSummaryDto;
 import com.cg.crypto_wallet.DTO.SummaryResponseDto;
 import com.cg.crypto_wallet.model.CoinPrice;
-import com.cg.crypto_wallet.model.CryptoHolding1;
+import com.cg.crypto_wallet.model.CryptoHoldings;
 import com.cg.crypto_wallet.model.User;
 import com.cg.crypto_wallet.repository.CoinPriceRepository;
 import com.cg.crypto_wallet.repository.CryptoHoldingsRepository;
@@ -28,13 +28,13 @@ public class SummaryService implements ISummaryService {
     @Override
     public SummaryResponseDto calculateSummary(User user) {
         // Get holdings only for the logged-in user
-        List<CryptoHolding1> holdings = holdingRepository.findByUser(user);
+        List<CryptoHoldings> holdings = holdingRepository.findByUser(user);
         List<CoinSummaryDto> coinSummaries = new ArrayList<>();
 
         double totalBuyValue = 0;
         double totalCurrentValue = 0;
 
-        for (CryptoHolding1 holding : holdings) {
+        for (CryptoHoldings holding : holdings) {
             String coin = holding.getCoinSymbol();
             double units = holding.getUnits();
             double buyPrice = holding.getPurchasePrice();

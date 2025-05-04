@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 public interface IUserService {
     ResponseDto loginUser(LoginDto loginDTO);
     ResponseDto registerUser(RegisterDto registerDTO);
-    ResponseDto deleteUserById(Long id);
+    ResponseDto deleteUser(String email);
     ResponseDto changePassword(ChangePasswordDto changePasswordDto);
     ResponseEntity<?> resetPassword(ResetPasswordDto resetPasswordDto);
     ResponseEntity<?> forgetPassword(String email);

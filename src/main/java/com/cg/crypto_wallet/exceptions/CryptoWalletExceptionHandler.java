@@ -33,4 +33,9 @@ public class CryptoWalletExceptionHandler {
         ResponseDto respDTO = new ResponseDto("Error: " ,exception.getMessage());
         return new ResponseEntity<>(respDTO, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<String> handleResourceNotFound(ResourceNotFoundException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
 }

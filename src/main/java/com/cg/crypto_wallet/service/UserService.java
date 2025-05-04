@@ -2,10 +2,12 @@ package com.cg.crypto_wallet.service;
 
 import com.cg.crypto_wallet.DTO.*;
 import com.cg.crypto_wallet.enums.Role;
+import com.cg.crypto_wallet.exceptions.ResourceNotFoundException;
 import com.cg.crypto_wallet.model.User;
 import com.cg.crypto_wallet.repository.UserRepository;
 import com.cg.crypto_wallet.utility.JwtUtility;
 import com.cg.crypto_wallet.utility.OTPGenerator;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -56,6 +58,7 @@ public class UserService implements IUserService {
         if (existsByEmail(registerDTO.getEmail())) {
             log.warn("registration failed: user already exists with email {}", registerDTO.getEmail());
             res.setMessage("User Already exist with these credentials");
+            res.setData("Failed to register user");
             return res;
         }
 
@@ -110,12 +113,10 @@ public class UserService implements IUserService {
         return passwordEncoder.matches(rawPassword, encodedPassword);
     }
 
-   public ResponseDto deleteUserById(Long id){
-        User user = userRepository.findById(id).orElse(null);
-        if (user == null) {
-            ResponseDto res = new ResponseDto("Not Found","User not present in Database");
-            return res;
-        }
+    // Delete User by Email
+    @Transactional
+    public ResponseDto deleteUser(String email) {
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
         userRepository.delete(user);
         return new ResponseDto("Deletion","User Deleted Successfully");
     }

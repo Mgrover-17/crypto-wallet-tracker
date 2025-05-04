@@ -1,12 +1,16 @@
 package com.cg.crypto_wallet.controller;
 
 import com.cg.crypto_wallet.DTO.*;
+import com.cg.crypto_wallet.exceptions.ResourceNotFoundException;
+import com.cg.crypto_wallet.model.User;
+import com.cg.crypto_wallet.repository.UserRepository;
 import com.cg.crypto_wallet.service.IUserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,6 +20,8 @@ class UserController {
 
     @Autowired
     private IUserService userService;
+    @Autowired
+    private UserRepository userRepository;
 
     @PostMapping("/register")
     public ResponseEntity<ResponseDto> registerUser(@Valid @RequestBody RegisterDto registerDTO) {
@@ -30,11 +36,12 @@ class UserController {
     }
 
 
-    @DeleteMapping("/deleteUser/{id}")
-    public ResponseDto deleteUser(@Valid @PathVariable Long id) {
-        return userService.deleteUserById(id);
+    @DeleteMapping("/deleteUser")
+    public ResponseDto deleteUser(Authentication authentication) {
 
+        return userService.deleteUser(authentication.getName());
     }
+
     @PutMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordDto resetPasswordDto) {
         return userService.resetPassword(resetPasswordDto);

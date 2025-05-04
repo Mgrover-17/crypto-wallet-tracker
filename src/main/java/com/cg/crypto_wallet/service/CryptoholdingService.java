@@ -1,7 +1,7 @@
 package com.cg.crypto_wallet.service;
 
 import com.cg.crypto_wallet.DTO.CryptoHoldingsDto;
-import com.cg.crypto_wallet.model.CryptoHolding1;
+import com.cg.crypto_wallet.model.CryptoHoldings;
 import com.cg.crypto_wallet.model.User;
 import com.cg.crypto_wallet.repository.CryptoHoldingsRepository;
 import com.cg.crypto_wallet.repository.UserRepository;
@@ -26,7 +26,7 @@ public class CryptoholdingService implements ICryptoholdingService{
     public CryptoHoldingsDto addHolding(String email, CryptoHoldingsDto dto) {
         User user = getUserByEmail(email);
 
-        CryptoHolding1 holding = new CryptoHolding1();
+        CryptoHoldings holding = new CryptoHoldings();
         holding.setCoinName(dto.getCoinName());
         holding.setCoinSymbol(dto.getCoinSymbol());
         holding.setUnits(dto.getUnits());
@@ -34,7 +34,7 @@ public class CryptoholdingService implements ICryptoholdingService{
         holding.setPurchaseDate(dto.getPurchaseDate());
         holding.setUser(user);
 
-        CryptoHolding1 saved = repository.save(holding);
+        CryptoHoldings saved = repository.save(holding);
         dto.setCryptoId(saved.getCryptoId());
         return dto;
     }
@@ -63,7 +63,7 @@ public class CryptoholdingService implements ICryptoholdingService{
 
         log.info("user found: " + user);
 
-        CryptoHolding1 holding = repository.findById(id)
+        CryptoHoldings holding = repository.findById(id)
                 .filter(h -> h.getUser().getId().equals(user.getId()))
                 .orElseThrow(() -> new RuntimeException("Holding not found or access denied"));
 
@@ -82,7 +82,7 @@ public class CryptoholdingService implements ICryptoholdingService{
     public void deleteHolding(String email, Long id) {
         User user = getUserByEmail(email);
 
-        CryptoHolding1 holding = repository.findById(id)
+        CryptoHoldings holding = repository.findById(id)
                 .filter(h -> h.getUser().getId().equals(user.getId()))
                 .orElseThrow(() -> new RuntimeException("Holding not found or access denied"));
 
