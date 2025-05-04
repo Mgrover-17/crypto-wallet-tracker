@@ -9,7 +9,7 @@ import java.time.LocalDate;
 
 @Data
 public class CryptoHoldingsDto {
-    private Long id;
+    private Long cryptoId;
 
     @NotBlank(message = "Coin name must not be blank")
     private String coinName;

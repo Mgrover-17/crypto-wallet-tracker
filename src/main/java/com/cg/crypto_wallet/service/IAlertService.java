@@ -17,6 +17,6 @@ public interface IAlertService {
     List<Alert> getActiveAlertsForUser(User user);
 
     // Update an alert
-    Alert updateAlert(Long alertId, Alert updatedAlert);
+    Alert updateAlert(Long alertId, Alert updatedAlert, User loggedInUser);
 
 }

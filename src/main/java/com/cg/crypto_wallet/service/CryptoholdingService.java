@@ -35,7 +35,7 @@ public class CryptoholdingService implements ICryptoholdingService{
         holding.setUser(user);
 
         CryptoHolding1 saved = repository.save(holding);
-        dto.setId(saved.getId());
+        dto.setCryptoId(saved.getCryptoId());
         return dto;
     }
 
@@ -46,7 +46,7 @@ public class CryptoholdingService implements ICryptoholdingService{
         return repository.findByUser(user).stream()
                 .map(holding -> {
                     CryptoHoldingsDto dto = new CryptoHoldingsDto();
-                    dto.setId(holding.getId());
+                    dto.setCryptoId(holding.getCryptoId());
                     dto.setCoinName(holding.getCoinName());
                     dto.setCoinSymbol(holding.getCoinSymbol());
                     dto.setUnits(holding.getUnits());
@@ -72,7 +72,7 @@ public class CryptoholdingService implements ICryptoholdingService{
         holding.setPurchaseDate(dto.getPurchaseDate());
 
         repository.save(holding);
-        dto.setId(holding.getId());
+        dto.setCryptoId(holding.getCryptoId());
         return dto;
     }
 
