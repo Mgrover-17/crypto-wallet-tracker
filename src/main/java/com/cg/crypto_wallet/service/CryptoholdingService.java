@@ -61,6 +61,8 @@ public class CryptoholdingService implements ICryptoholdingService{
     public CryptoHoldingsDto updateHolding(String email, Long id, CryptoHoldingsDto dto) {
         User user = getUserByEmail(email);
 
+        log.info("user found: " + user);
+
         CryptoHolding1 holding = repository.findById(id)
                 .filter(h -> h.getUser().getId().equals(user.getId()))
                 .orElseThrow(() -> new RuntimeException("Holding not found or access denied"));
