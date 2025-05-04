@@ -52,36 +52,36 @@ public class AlertController {
         return new ResponseEntity<>(createdAlert, HttpStatus.CREATED);
     }
 
-    // Get active alerts for a user
+//     Get active alerts for a user
+    @GetMapping("/user/{userId}")
+    public List<Alert> getActiveAlertsForUser(@PathVariable Long userId) {
+        User user = new User(); // You will need to fetch the user from the database
+        user.setId(userId);
+        return alertService.getActiveAlertsForUser(user);
+    }
+
 //    @GetMapping("/user/{userId}")
 //    public List<Alert> getActiveAlertsForUser(@PathVariable Long userId) {
-//        User user = new User(); // You will need to fetch the user from the database
-//        user.setId(userId);
+//        User user = userRepository.findById(userId)
+//                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+//        log.info("found user: " + user);
 //        return alertService.getActiveAlertsForUser(user);
 //    }
 
-    @GetMapping("/user/{userId}")
-    public List<Alert> getActiveAlertsForUser(@PathVariable Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
-        log.info("found user: " + user);
-        return alertService.getActiveAlertsForUser(user);
-    }
-
-    @GetMapping("/my-alerts")
-    public List<Alert> getMyActiveAlerts() {
-        // Get the currently authenticated user's email (or username)
-        log.info("hello");
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName(); // assuming email is the username
-
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
-
-        log.info("Found user: " + user);
-
-        return alertService.getActiveAlertsForUser(user);
-    }
+//    @GetMapping("/my-alerts")
+//    public List<Alert> getMyActiveAlerts(Principal principal) {
+//
+//        User userFromDb = userRepository.findByEmail(principal.getName())
+//                .orElseThrow(() -> new RuntimeException("User not found"));
+//
+//        log.info("hello");
+//        log.info("Found user: " + userFromDb);
+//
+//        User user = new User(); // You will need to fetch the user from the database
+//        user.setId(userFromDb.getId());
+//
+//        return alertService.getActiveAlertsForUser(user);
+//    }
 
     // Get all active alerts
     @GetMapping("/active")
