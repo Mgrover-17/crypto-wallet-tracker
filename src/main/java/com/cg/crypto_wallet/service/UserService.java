@@ -86,28 +86,34 @@ public class UserService implements IUserService {
         if (userExists.isPresent()) {
             User user = userExists.get();
             if (matchPassword(loginDTO.getPassword(), user.getPassword())) {
-                String token = jwtUtility.generateToken(user.getEmail());
+                String token = jwtUtility.generateToken(user);
                 log.debug("Generated token for user {}: {}", user.getEmail(), token);
-                System.out.println("Generated JWT token: " + token);
-                user.setToken(token);
-                userRepository.save(user);
+
+                // Send email notification
+                emailService.sendEmail(
+                        user.getEmail(),
+                        "Logged in Crypto-Wallet Application",
+                        "You have been successfully logged in. Your token: " + token
+                );
 
                 log.debug("Login successful for user: {} - Token generated", user.getEmail());
-                emailService.sendEmail(user.getEmail(), "Logged in Crypto-Wallet Application. You have been successfully logged in", token);log.error("User not found with email: {}", loginDTO.getEmail());
-                res.setMessage("User has Successfully logged in here is the token generated:- ");
+                res.setMessage("User has successfully logged in. Here is the generated token:");
                 res.setData(token);
                 return res;
             } else {
                 log.warn("Invalid credentials for user: {}", loginDTO.getEmail());
                 res.setMessage("Wrong Credentials");
-                res.setData("Pls re-fill your details");
+                res.setData("Please re-enter your details");
                 return res;
             }
         }
+
+        log.error("No user found with email: {}", loginDTO.getEmail());
         res.setMessage("No data found");
         res.setData("User does not exist in Database");
         return res;
     }
+
     public boolean matchPassword(String rawPassword, String encodedPassword) {
         log.debug("Matching password for login attempt");
         return passwordEncoder.matches(rawPassword, encodedPassword);

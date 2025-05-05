@@ -1,63 +1,70 @@
 package com.cg.crypto_wallet.utility;
 
-
 import com.cg.crypto_wallet.model.User;
-import com.cg.crypto_wallet.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 @Component
-public class JwtUtility{
-    @Autowired
-    UserRepository userRepository;
+public class JwtUtility {
 
+    private static final String SECRET_KEY = "QWERTYUIOP1234567890ASDFGHJDFGHJJL";
 
-    private static final String SECRET_KEY="QWERTYUIOP1234567890ASDFGHJDFGHJJL";
-
-    public String generateToken(String email){
+    //  Generate token with email as subject, 1-hour expiry
+    public String generateToken(User user){
         return Jwts.builder()
-                .setSubject(email)
+                .setSubject(user.getEmail())
+                .claim("role", user.getRole().name())   // include role claim
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 60*60*1000))
                 .signWith(Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8)), SignatureAlgorithm.HS256)
                 .compact();
     }
-    public String extractEmail(String token){
-        try{
-            System.out.println(token);
+
+
+    //  Extract email from token
+    public String extractEmail(String token) {
+        try {
             Claims claims = Jwts.parserBuilder()
                     .setSigningKey(Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8)))
                     .build()
                     .parseClaimsJws(token)
                     .getBody();
-            System.out.println("Getting email =>"+claims);
             return claims.getSubject();
-        }
-        catch (Exception e){
-            return e.getMessage();
+        } catch (Exception e) {
+            return null;
         }
     }
-    public boolean validateToken(String token,String userEmail){
+
+    //  Validate token by checking email match and expiration
+    public boolean validateToken(String token, String userEmail) {
         final String email = extractEmail(token);
-        boolean isTokenPresent = true;
-        User user = userRepository.findByEmail(email).orElse(null);
-        if(user != null && user.getToken()==null){
-            isTokenPresent=false;
+        if (email == null) {
+            return false;
         }
-        final boolean valid= Jwts.parserBuilder()
-                .setSigningKey(SECRET_KEY.getBytes())
+
+        final Date expirationDate = Jwts.parserBuilder()
+                .setSigningKey(Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8)))
                 .build()
                 .parseClaimsJws(token)
                 .getBody()
-                .getExpiration().before(new Date());
+                .getExpiration();
 
-        return (email.equals(userEmail) && !valid && isTokenPresent);
+        boolean isExpired = expirationDate.before(new Date());
+
+        return email.equals(userEmail) && !isExpired;
     }
+    public String extractRole(String token) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8)))
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+        return claims.get("role", String.class);
+    }
+
 }

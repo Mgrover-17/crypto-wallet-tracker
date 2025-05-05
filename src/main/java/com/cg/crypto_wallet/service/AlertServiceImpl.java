@@ -2,14 +2,12 @@ package com.cg.crypto_wallet.service;
 
 import com.cg.crypto_wallet.exceptions.CryptoWalletException;
 import com.cg.crypto_wallet.model.Alert;
-import com.cg.crypto_wallet.model.CoinPrice;
 import com.cg.crypto_wallet.model.User;
 import com.cg.crypto_wallet.repository.AlertRepository;
 import com.cg.crypto_wallet.repository.CoinPriceRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 

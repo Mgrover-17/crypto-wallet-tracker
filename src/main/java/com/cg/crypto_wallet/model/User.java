@@ -47,8 +47,6 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private String password;
 
-    private String token;
-
     @Enumerated(EnumType.STRING)
     private Role role;
 
@@ -69,10 +67,3 @@ public class User implements UserDetails {
         return email;
     }
 }
-
-//
-//
-//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-//    private List<Transaction> transactions;
-
-//    private LocalDateTime createdAt;
