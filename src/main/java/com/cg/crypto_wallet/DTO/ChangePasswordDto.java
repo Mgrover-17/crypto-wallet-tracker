@@ -20,13 +20,6 @@ import org.springframework.validation.annotation.Validated;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ChangePasswordDto {
-
-
-
-
-    @NotBlank(message = "Password is required")
-    @Size(min = 6, message = "Password must be at least 6 characters long")
-
     @Pattern(
             regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$",
             message = "Invalid email format"
@@ -39,9 +32,9 @@ public class ChangePasswordDto {
     @Size(min = 6, message = "Password must be at least 6 characters long")
     @Column(nullable = false)
     private String oldPassword;
+
     @NotBlank(message = "Password is required")
     @Size(min = 6, message = "Password must be at least 6 characters long")
     @Column(nullable = false)
-
     private String newPassword;
 }

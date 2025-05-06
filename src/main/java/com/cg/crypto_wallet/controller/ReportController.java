@@ -1,9 +1,6 @@
 package com.cg.crypto_wallet.controller;
 
-import com.cg.crypto_wallet.DTO.SummaryResponseDto;
 import com.cg.crypto_wallet.service.EmailService;
-import com.cg.crypto_wallet.service.IReportService;
-import com.cg.crypto_wallet.service.ISummaryService;
 import com.cg.crypto_wallet.service.ReportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
